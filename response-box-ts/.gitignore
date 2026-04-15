@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+.npm-cache/
+.npm/
+
+# Build output
+dist/
+
+# Editor
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

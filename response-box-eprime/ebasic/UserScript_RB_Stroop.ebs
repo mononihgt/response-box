@@ -1,0 +1,232 @@
+Option Explicit
+
+Const RB_BAUD As Long = 115200
+Const WHITE_KEY As Integer = 5
+Const FAST_RT_MS As Long = 200
+Const START_TIMEOUT_MS As Long = 60000
+Const RESPONSE_TIMEOUT_MS As Long = 2000
+
+Dim gRB As SerialDevice
+Dim gRBInfo As SerialDeviceInfo
+
+Dim gRespValid As Integer
+Dim gRespTimedOut As Integer
+Dim gRespUserExit As Integer
+Dim gRespKey As Integer
+Dim gRespT1 As Long
+Dim gRespT2 As Long
+Dim gRespPressDuration As Long
+Dim gRespSoftwareRT As Long
+Dim gRespSystemDelay As Long
+Dim gRespIDE As Long
+
+Dim gLoggedTrials As Long
+Dim gCorrectTrials As Long
+Dim gCongruentCorrectN As Long
+Dim gCongruentCorrectSum As Long
+Dim gIncongruentCorrectN As Long
+Dim gIncongruentCorrectSum As Long
+Dim gStopExperiment As Integer
+
+Sub RB_ResetStats()
+    gLoggedTrials = 0
+    gCorrectTrials = 0
+    gCongruentCorrectN = 0
+    gCongruentCorrectSum = 0
+    gIncongruentCorrectN = 0
+    gIncongruentCorrectSum = 0
+    gStopExperiment = 0
+End Sub
+
+Sub RB_ClearResponse()
+    gRespValid = 0
+    gRespTimedOut = 0
+    gRespUserExit = 0
+    gRespKey = 0
+    gRespT1 = 0
+    gRespT2 = 0
+    gRespPressDuration = 0
+    gRespSoftwareRT = 0
+    gRespSystemDelay = 0
+    gRespIDE = 0
+End Sub
+
+Function RB_KeyName(ByVal k As Integer) As String
+    Select Case k
+        Case 1
+            RB_KeyName = "绿色键"
+        Case 2
+            RB_KeyName = "蓝色键"
+        Case 3
+            RB_KeyName = "红色键"
+        Case 4
+            RB_KeyName = "黄色键"
+        Case 5
+            RB_KeyName = "白色键（退出）"
+        Case Else
+            RB_KeyName = "未知按键(" & CStr(k) & ")"
+    End Select
+End Function
+
+Function RB_ColorName(ByVal colorCode As String) As String
+    Select Case LCase$(colorCode)
+        Case "red"
+            RB_ColorName = "red"
+        Case "green"
+            RB_ColorName = "green"
+        Case Else
+            RB_ColorName = colorCode
+    End Select
+End Function
+
+Sub RB_Init(ByVal portName As String)
+    Set gRBInfo = New SerialDeviceInfo
+    gRBInfo.PortName = portName
+    gRBInfo.BaudRate = RB_BAUD
+    gRBInfo.DataBits = 8
+    gRBInfo.Parity = ebParityNo
+    gRBInfo.StopBits = ebStopBits1_0
+
+    Set gRB = New SerialDevice
+    gRB.Open gRBInfo
+    gRB.FlushInputBuffer
+    gRB.FlushOutputBuffer
+End Sub
+
+Sub RB_Close()
+    On Error Resume Next
+    If Not gRB Is Nothing Then
+        gRB.Close
+    End If
+    Set gRB = Nothing
+    Set gRBInfo = Nothing
+    On Error GoTo 0
+End Sub
+
+Sub RB_WriteCmd2(ByVal b1 As Integer, ByVal b2 As Integer)
+    gRB.WriteByte b1
+    gRB.WriteByte b2
+End Sub
+
+Function RB_QueryDeviceId() As String
+    Dim b As Integer
+    Dim bytesRead As Long
+    Dim t0 As Long
+    Dim buf(2) As Integer
+    Dim idx As Integer
+
+    RB_QueryDeviceId = ""
+    gRB.FlushInputBuffer
+    RB_WriteCmd2 &H5A, 0
+
+    idx = 0
+    t0 = Clock.Read
+    Do While Clock.Read - t0 < 1000
+        bytesRead = gRB.ReadByte(b)
+        If bytesRead > 0 Then
+            If idx <= 2 Then
+                buf(idx) = b
+                idx = idx + 1
+            End If
+            If idx = 3 Then Exit Do
+        End If
+    Loop
+
+    If idx >= 2 And buf(0) = &H5A Then
+        If idx >= 3 Then
+            RB_QueryDeviceId = Right$("0" & Hex$(buf(1)), 2) & Right$("0" & Hex$(buf(2)), 2)
+        ElseIf idx = 2 Then
+            RB_QueryDeviceId = Right$("0" & Hex$(buf(1)), 2)
+        End If
+    End If
+End Function
+
+Function RB_WaitFrame(ByVal timeoutMs As Long) As Integer
+    Dim frame(7) As Integer
+    Dim idx As Integer
+    Dim b As Integer
+    Dim bytesRead As Long
+    Dim triggerTick As Long
+    Dim receiveTick As Long
+
+    RB_ClearResponse
+    RB_WaitFrame = 0
+
+    gRB.FlushInputBuffer
+    RB_WriteCmd2 &HFC, 0
+    Sleep 10
+    triggerTick = Clock.Read
+    RB_WriteCmd2 &HFB, 0
+
+    idx = 0
+    Do While Clock.Read - triggerTick < timeoutMs
+        bytesRead = gRB.ReadByte(b)
+        If bytesRead > 0 Then
+            If idx <= 7 Then
+                frame(idx) = b
+                idx = idx + 1
+            End If
+            If idx = 8 Then Exit Do
+        End If
+    Loop
+
+    receiveTick = Clock.Read
+    gRespSoftwareRT = receiveTick - triggerTick
+
+    If idx <> 8 Then
+        gRespTimedOut = 1
+        Exit Function
+    End If
+
+    If frame(0) <> &HFB Then Exit Function
+    If frame(1) < 1 Or frame(1) > 5 Then Exit Function
+
+    gRespKey = frame(1)
+    gRespT1 = CLng(frame(2)) * 256 + CLng(frame(3))
+    gRespT2 = CLng(frame(4)) * 256 + CLng(frame(5))
+    gRespIDE = CLng(frame(6)) * 256 + CLng(frame(7))
+    gRespPressDuration = gRespT2 - gRespT1
+    gRespSystemDelay = gRespSoftwareRT - gRespT2
+
+    If gRespKey = WHITE_KEY Then
+        gRespUserExit = 1
+    End If
+
+    gRespValid = 1
+    RB_WaitFrame = 1
+End Function
+
+Function RB_PickTemplateId() As Integer
+    RB_PickTemplateId = CInt(Int(Rnd() * 4)) + 1
+End Function
+
+Function RB_SummaryText() As String
+    Dim s As String
+    Dim acc As Double
+    Dim congRT As Double
+    Dim incongRT As Double
+
+    If gLoggedTrials = 0 Then
+        RB_SummaryText = "没有有效数据"
+        Exit Function
+    End If
+
+    acc = CDbl(gCorrectTrials) / CDbl(gLoggedTrials) * 100#
+    s = "实验完成！" & vbCrLf & "总试次: " & CStr(gLoggedTrials) & vbCrLf & "正确率: " & Format$(acc, "0.0") & "%"
+
+    If gCongruentCorrectN > 0 Then
+        congRT = CDbl(gCongruentCorrectSum) / CDbl(gCongruentCorrectN)
+        s = s & vbCrLf & "一致试次平均RT: " & Format$(congRT, "0") & " ms"
+    End If
+
+    If gIncongruentCorrectN > 0 Then
+        incongRT = CDbl(gIncongruentCorrectSum) / CDbl(gIncongruentCorrectN)
+        s = s & vbCrLf & "不一致试次平均RT: " & Format$(incongRT, "0") & " ms"
+    End If
+
+    If gCongruentCorrectN > 0 And gIncongruentCorrectN > 0 Then
+        s = s & vbCrLf & "Stroop效应: " & Format$(incongRT - congRT, "0") & " ms"
+    End If
+
+    RB_SummaryText = s
+End Function

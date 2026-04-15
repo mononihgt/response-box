@@ -1,0 +1,9 @@
+If c.GetAttrib("trial_logged") = "0" Or c.GetAttrib("stop_experiment") = "1" Then
+    ITIDisplay.Duration = 0
+Else
+    ITIDisplay.Duration = 1000
+End If
+
+If c.GetAttrib("stop_experiment") = "1" Then
+    TrialList.Terminate
+End If

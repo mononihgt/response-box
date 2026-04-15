@@ -1,0 +1,42 @@
+Dim pick As Integer
+Dim taskType As String
+Dim redKey As Integer
+Dim greenKey As Integer
+
+pick = RB_PickTemplateId()
+taskType = LCase$(c.GetAttrib("task_type"))
+redKey = CInt(c.GetAttrib("red_key_code"))
+greenKey = CInt(c.GetAttrib("green_key_code"))
+
+c.SetAttrib "trial", c.GetAttrib("trial_index")
+
+Select Case pick
+    Case 1
+        c.SetAttrib "word", "红"
+        c.SetAttrib "color", "red"
+        c.SetAttrib "congruent", "1"
+        c.SetAttrib "correct_key", CStr(redKey)
+    Case 2
+        c.SetAttrib "word", "绿"
+        c.SetAttrib "color", "green"
+        c.SetAttrib "congruent", "1"
+        c.SetAttrib "correct_key", CStr(greenKey)
+    Case 3
+        c.SetAttrib "word", "红"
+        c.SetAttrib "color", "green"
+        c.SetAttrib "congruent", "0"
+        If taskType = "color" Then
+            c.SetAttrib "correct_key", CStr(greenKey)
+        Else
+            c.SetAttrib "correct_key", CStr(redKey)
+        End If
+    Case Else
+        c.SetAttrib "word", "绿"
+        c.SetAttrib "color", "red"
+        c.SetAttrib "congruent", "0"
+        If taskType = "color" Then
+            c.SetAttrib "correct_key", CStr(redKey)
+        Else
+            c.SetAttrib "correct_key", CStr(greenKey)
+        End If
+End Select

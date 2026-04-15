@@ -1,0 +1,10 @@
+{
+  "participant_name": "",
+  "participant_age": "",
+  "participant_gender": "男",
+  "task_type": "color",
+  "red_key_code": 3,
+  "green_key_code": 1,
+  "rb_port": "",
+  "rb_device_id": ""
+}

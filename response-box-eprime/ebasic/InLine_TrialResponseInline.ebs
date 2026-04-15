@@ -1,0 +1,72 @@
+Dim redKey As Integer
+Dim greenKey As Integer
+Dim expectedKey As Integer
+Dim isCorrect As Integer
+Dim wrongKey As Integer
+Dim fastResp As Integer
+Dim congruent As Integer
+
+RB_WaitFrame RESPONSE_TIMEOUT_MS
+
+If gRespTimedOut = 1 Then
+    c.SetAttrib "trial_logged", "0"
+    c.SetAttrib "feedback_text", "反应超时，请集中注意！"
+    c.SetAttrib "feedback_color", "255,255,0"
+ElseIf gRespUserExit = 1 Then
+    c.SetAttrib "trial_logged", "0"
+    c.SetAttrib "stop_experiment", "1"
+    gStopExperiment = 1
+    c.SetAttrib "feedback_text", ""
+    c.SetAttrib "feedback_color", "255,255,255"
+Else
+    redKey = CInt(c.GetAttrib("red_key_code"))
+    greenKey = CInt(c.GetAttrib("green_key_code"))
+    expectedKey = CInt(c.GetAttrib("correct_key"))
+    congruent = CInt(c.GetAttrib("congruent"))
+
+    isCorrect = 0
+    If gRespKey = expectedKey Then isCorrect = 1
+
+    wrongKey = 0
+    If gRespKey <> redKey And gRespKey <> greenKey Then wrongKey = 1
+
+    fastResp = 0
+    If gRespT1 < FAST_RT_MS Then fastResp = 1
+
+    c.SetAttrib "trial_logged", "1"
+    c.SetAttrib "response_key", CStr(gRespKey)
+    c.SetAttrib "response_name", RB_KeyName(gRespKey)
+    c.SetAttrib "t1_press", CStr(gRespT1)
+    c.SetAttrib "t2_release", CStr(gRespT2)
+    c.SetAttrib "press_duration", CStr(gRespPressDuration)
+    c.SetAttrib "software_rt", CStr(gRespSoftwareRT)
+    c.SetAttrib "key_delay", CStr(gRespPressDuration)
+    c.SetAttrib "system_delay", CStr(gRespSystemDelay)
+    c.SetAttrib "correct", CStr(isCorrect)
+
+    gLoggedTrials = gLoggedTrials + 1
+    If isCorrect = 1 Then
+        gCorrectTrials = gCorrectTrials + 1
+        If congruent = 1 Then
+            gCongruentCorrectN = gCongruentCorrectN + 1
+            gCongruentCorrectSum = gCongruentCorrectSum + gRespT1
+        Else
+            gIncongruentCorrectN = gIncongruentCorrectN + 1
+            gIncongruentCorrectSum = gIncongruentCorrectSum + gRespT1
+        End If
+    End If
+
+    If fastResp = 1 Then
+        c.SetAttrib "feedback_text", "反应过快（<200ms），请保持自然节奏" & vbCrLf & "反应时: " & CStr(gRespT1) & " ms"
+        c.SetAttrib "feedback_color", "0,128,255"
+    ElseIf wrongKey = 1 Then
+        c.SetAttrib "feedback_text", "按错键，请使用指定按键"
+        c.SetAttrib "feedback_color", "255,255,255"
+    ElseIf isCorrect = 1 Then
+        c.SetAttrib "feedback_text", "反应正确" & vbCrLf & "按键反应时为 " & CStr(gRespT1) & " ms" & vbCrLf & "松键反应时为 " & CStr(gRespT2) & " ms"
+        c.SetAttrib "feedback_color", "0,255,0"
+    Else
+        c.SetAttrib "feedback_text", "反应错误，请集中注意"
+        c.SetAttrib "feedback_color", "255,0,0"
+    End If
+End If

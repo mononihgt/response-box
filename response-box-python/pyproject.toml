@@ -1,0 +1,11 @@
+[project]
+name = "response-box-python"
+version = "0.1.0"
+description = "Python utilities and PsychoPy integration for the response box."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "psychopy>=2025.2.3",
+    "pyserial>=3.5",
+    "scipy>=1.8",
+]

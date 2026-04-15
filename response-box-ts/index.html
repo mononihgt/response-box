@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>反应盒实验系统</title>
+  <link rel="stylesheet" href="/src/styles/main.css">
+</head>
+<body>
+  <div id="app">
+    <nav class="navbar">
+      <div class="nav-content">
+        <h1 class="logo">反应盒实验系统</h1>
+        <div class="nav-status">
+          <span id="connectionStatus" class="status-badge disconnected">未连接</span>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div id="homePage" class="page active">
+        <div class="main-screen">
+          <div class="welcome-box">
+            <h1 class="welcome-title">欢迎使用反应盒实验系统</h1>
+            <p class="welcome-subtitle">请先连接反应盒设备</p>
+          </div>
+
+          <div class="connect-section">
+            <button id="btnConnect" class="btn btn-primary btn-xl">连接反应盒</button>
+            <p class="connect-hint">点击按钮选择串口设备</p>
+          </div>
+
+          <div class="quick-actions hidden" id="quickActions">
+            <button id="btnTest" class="btn btn-secondary">连接测试</button>
+            <button id="btnExperiment" class="btn btn-success">开始实验</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="testPage" class="page">
+        <div class="main-screen">
+          <div class="page-header">
+            <h2>连接测试</h2>
+            <div>
+              <button id="btnStartExperimentFromTest" class="btn btn-success">开始实验</button>
+              <button id="btnBackFromTest" class="btn btn-secondary">返回</button>
+            </div>
+          </div>
+
+          <div class="test-panel">
+            <div class="test-instructions">
+              <p>请按下反应盒上的任意按键测试连接</p>
+            </div>
+
+            <div class="test-area">
+              <button id="btnStartTest" class="btn btn-primary btn-large">开始测试</button>
+              <button id="btnStopTest" class="btn btn-danger btn-large hidden">停止测试</button>
+            </div>
+
+            <div id="testLog" class="test-log">
+              <h4>测试记录</h4>
+              <div id="testLogContent" class="log-content"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="experimentPage" class="page">
+        <div id="participantInfo" class="section">
+          <div class="main-screen">
+            <h2>被试信息</h2>
+            <form id="participantForm" class="form">
+              <div class="form-group">
+                <label for="participantId">被试编号 *</label>
+                <input type="text" id="participantId" required placeholder="P001" autocomplete="off">
+              </div>
+              <div class="form-group">
+                <label for="participantTaskType">任务类型 *</label>
+                <select id="participantTaskType" required>
+                  <option value="color">根据颜色按键</option>
+                  <option value="word">根据文字按键</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="participantAge">年龄</label>
+                <input type="number" id="participantAge" min="1" max="120" placeholder="25">
+              </div>
+              <div class="form-group">
+                <label for="participantGender">性别</label>
+                <select id="participantGender">
+                  <option value="">请选择</option>
+                  <option value="male">男</option>
+                  <option value="female">女</option>
+                  <option value="other">其他</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="redKeyMapping">看到红色/“红”字时按 *</label>
+                <select id="redKeyMapping" required>
+                  <option value="1">绿色键</option>
+                  <option value="2">蓝色键</option>
+                  <option value="3" selected>红色键</option>
+                  <option value="4">黄色键</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="greenKeyMapping">看到绿色/“绿”字时按 *</label>
+                <select id="greenKeyMapping" required>
+                  <option value="1">绿色键</option>
+                  <option value="2" selected>蓝色键</option>
+                  <option value="3">红色键</option>
+                  <option value="4">黄色键</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="trialsPerCondition">每种条件试次数 *</label>
+                <input type="number" id="trialsPerCondition" min="1" max="80" step="1" value="10" required>
+                <p class="form-help">总试次数 = 4 × 每种条件试次数（2 一致 + 2 不一致）</p>
+              </div>
+              <div class="form-group">
+                <label for="responseTimeoutMs">反应超时（毫秒）*</label>
+                <input type="number" id="responseTimeoutMs" min="300" max="10000" step="100" value="5000" required>
+              </div>
+              <div class="form-group">
+                <label for="feedbackDurationMs">反馈时长（毫秒）*</label>
+                <input type="number" id="feedbackDurationMs" min="0" max="3000" step="50" value="500" required>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">继续</button>
+                <button type="button" id="btnBackFromInfo" class="btn btn-secondary">返回</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div id="instructions" class="hidden instructions-panel">
+            <h2>实验说明</h2>
+            <p class="instruction-main" id="instructionMain">判断字的颜色</p>
+            
+            <div class="instruction-mapping">
+              <p class="instruction-row" id="instructionRedMapping">红色 → 按红色键</p>
+              <p class="instruction-row" id="instructionGreenMapping">绿色 → 按绿色键</p>
+            </div>
+
+            <p class="instruction-note">反应盒白键可随时提前结束实验</p>
+            <p class="instruction-note">请尽量保持快速且准确，避免刻意抢答</p>
+
+            <div class="form-actions">
+              <button id="btnStartExperiment" class="btn btn-success btn-large">开始实验</button>
+              <button id="btnBackFromInstructions" class="btn btn-secondary">返回</button>
+            </div>
+        </div>
+
+        <div id="experimentRunning" class="hidden experiment-running">
+          <div class="experiment-header">
+            <div id="progressInfo" class="progress-info">试次: 0 / 0</div>
+            <div class="progress-bar">
+              <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <div class="experiment-stage">
+            <div id="mask" class="mask hidden">@@</div>
+            <div id="fixation" class="fixation hidden">+</div>
+            <div id="stimulus" class="stimulus hidden"></div>
+            <div id="feedback" class="feedback hidden"></div>
+          </div>
+        </div>
+
+        <div id="experimentFinished" class="section hidden">
+          <div class="main-screen">
+            <h2>实验完成</h2>
+            <div class="results-summary">
+              <h3>实验结果</h3>
+              <div id="resultsSummary" class="stats-grid"></div>
+            </div>
+
+            <div class="form-actions">
+              <button id="btnDownloadData" class="btn btn-success btn-large">保存数据</button>
+              <button id="btnBackToHome" class="btn btn-secondary">返回首页</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

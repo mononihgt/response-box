@@ -1,0 +1,20 @@
+Dim portName As String
+Dim deviceId As String
+
+portName = Trim$(c.GetAttrib("rb_port"))
+If portName = "" Then
+    MsgBox "请先运行 runtime\\detect_reaction_box.ps1，并把找到的 COM 端口填入 StartupInfo.rb_port"
+    CancelRun
+End If
+
+RB_Init portName
+deviceId = RB_QueryDeviceId()
+
+If deviceId = "" Then
+    MsgBox "反应盒握手失败，请检查 COM 口、驱动或硬件连接。"
+    RB_Close
+    CancelRun
+End If
+
+c.SetAttrib "rb_device_id", deviceId
+c.SetAttrib "pretest_status", "反应盒已连接，可开始测试"

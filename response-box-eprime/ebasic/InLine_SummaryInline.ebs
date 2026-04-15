@@ -1,0 +1,1 @@
+c.SetAttrib "summary_text", RB_SummaryText()

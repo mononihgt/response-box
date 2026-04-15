@@ -1,0 +1,40 @@
+Dim loopDone As Integer
+Dim cmdKey As Integer
+Dim menuText As String
+
+loopDone = 0
+
+Do While loopDone = 0
+    menuText = c.GetAttrib("pretest_status") & vbCrLf & vbCrLf & "按 1 开始/继续测试" & vbCrLf & "按 2 进入实验" & vbCrLf & "按 5 退出"
+    PretestMenuSlide.Text = menuText
+    PretestMenuSlide.Run
+
+    If RB_WaitFrame(60000) = 0 Then
+        c.SetAttrib "pretest_status", "等待操作超时，请重新选择"
+    Else
+        cmdKey = gRespKey
+
+        If cmdKey = 5 Then
+            RB_Close
+            CancelRun
+        ElseIf cmdKey = 2 Then
+            c.SetAttrib "pretest_status", "预检完成，进入实验"
+            loopDone = 1
+        Else
+            c.SetAttrib "pretest_status", "测试中，请按键……"
+            PretestConnectSlide.Run
+
+            Do
+                If RB_WaitFrame(500) = 1 Then
+                    If gRespUserExit = 1 Then
+                        c.SetAttrib "pretest_status", "测试结束，可进入实验"
+                        Exit Do
+                    Else
+                        c.SetAttrib "pretest_status", RB_KeyName(gRespKey) & vbCrLf & "按键: " & CStr(gRespT1) & " ms" & vbCrLf & "松键: " & CStr(gRespT2) & " ms" & vbCrLf & "系统误差: " & CStr(gRespSystemDelay) & " ms" & vbCrLf & vbCrLf & "白键结束测试"
+                        PretestConnectSlide.Run
+                    End If
+                End If
+            Loop
+        End If
+    End If
+Loop

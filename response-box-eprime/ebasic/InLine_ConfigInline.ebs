@@ -1,0 +1,38 @@
+If Trim$(c.GetAttrib("participant_name")) = "" Then
+    MsgBox "错误：姓名不能为空！"
+    CancelRun
+End If
+
+If Trim$(c.GetAttrib("participant_age")) = "" Then
+    MsgBox "错误：年龄不能为空！"
+    CancelRun
+End If
+
+If Val(c.GetAttrib("participant_age")) <= 0 Then
+    MsgBox "错误：年龄必须是正整数！"
+    CancelRun
+End If
+
+If CInt(c.GetAttrib("red_key_code")) = CInt(c.GetAttrib("green_key_code")) Then
+    MsgBox "错误：红色和绿色不能使用同一个按键！"
+    CancelRun
+End If
+
+Randomize
+RB_ResetStats
+c.SetAttrib "name", c.GetAttrib("participant_name")
+c.SetAttrib "age", c.GetAttrib("participant_age")
+c.SetAttrib "gender", c.GetAttrib("participant_gender")
+c.SetAttrib "task_type", LCase$(c.GetAttrib("task_type"))
+c.SetAttrib "date", FormatDateTime(Date, vbShortDate)
+c.SetAttrib "time", FormatDateTime(Time, vbLongTime)
+c.SetAttrib "red_key_name", RB_KeyName(CInt(c.GetAttrib("red_key_code")))
+c.SetAttrib "green_key_name", RB_KeyName(CInt(c.GetAttrib("green_key_code")))
+If LCase$(c.GetAttrib("task_type")) = "color" Then
+    c.SetAttrib "task_desc", "看到字的颜色"
+Else
+    c.SetAttrib "task_desc", "看到字的内容"
+End If
+c.SetAttrib "pretest_status", "正在连接反应盒..."
+c.SetAttrib "pretest_mode", "menu"
+c.SetAttrib "stop_experiment", "0"

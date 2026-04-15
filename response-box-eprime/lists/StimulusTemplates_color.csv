@@ -1,0 +1,5 @@
+template_id,word,color,congruent,correct_rule
+1,红,red,1,red
+2,绿,green,1,green
+3,红,green,0,green
+4,绿,red,0,red

@@ -1,0 +1,5 @@
+If RB_WaitFrame(START_TIMEOUT_MS) = 0 Then
+    MsgBox "错误：无法读取反应盒数据，实验退出。"
+    RB_Close
+    CancelRun
+End If
