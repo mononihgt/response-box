@@ -30,10 +30,17 @@ response-box-matlab/
 
 ## Requirements
 
-- MATLAB `R2022b+` (validated on `R2025b`)
+- MATLAB `R2019b+` minimum because this implementation uses `serialport`
+- Validated on MATLAB `R2025b`
 - Response box connected via USB serial
 - CH340/CH341 driver if your hardware uses it
 - Psychtoolbox optional; basic graphics fallback is built in
+
+### MATLAB Version Compatibility
+
+The MATLAB implementation depends on the modern `serialport` API for serial discovery, connection, and frame reads. MathWorks introduced `serialport` in MATLAB `R2019b`, so readers using MATLAB `R2019a` or earlier cannot run this project as-is.
+
+If you are on an older MATLAB release, upgrade to `R2019b` or later before running the experiment. A legacy fallback would require code changes to replace `serialport` calls with the older `serial` interface, which is not currently implemented in this repository.
 
 ## Quick Start
 
@@ -82,6 +89,8 @@ Quick MATLAB static analysis:
 ```powershell
 & 'D:\Program Files (x86)\MATLAB\R2025b\bin\matlab.exe' -batch "checkcode('run_experiment.m','-id')"
 ```
+
+Use the path for your installed MATLAB version. The project requires `R2019b+`; the `R2025b` path above is only an example from the validated environment.
 
 Full folder static pass:
 

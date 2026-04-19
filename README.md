@@ -32,6 +32,7 @@ MATLAB:
 cd response-box-matlab
 .\run_matlab_safe.ps1
 ```
+Requires MATLAB `R2019b` or later because the MATLAB implementation uses the `serialport` API for USB serial communication. MATLAB `R2019a` and earlier do not include `serialport`.
 
 E-Prime:
 ```text
@@ -43,11 +44,12 @@ Open E-Studio and follow response-box-eprime/docs/E_STUDIO_BUILD_STEPS.md.
 - Keep device I/O, experiment logic, UI flow, and data export separated.
 - Generated artifacts such as `node_modules/`, `.venv/`, caches, build output, and local logs should remain untracked.
 - Hardware validation requires a CH341/USB serial response box and cannot be proven by builds or static checks alone.
+- The MATLAB runtime requires MATLAB `R2019b+`; older MATLAB releases need a code change to use the legacy `serial` interface.
 
 ## Validation Matrix
 - TypeScript: `npm run build`, then manual browser checks for connect, test, run, and export flows.
 - Python: import/compile checks, `uv run connection_test.py`, then a full `uv run experiment_psychopy.py` pass when display and hardware are available.
-- MATLAB: static parse checks where available, then a MATLAB run of `run_experiment.m`.
+- MATLAB: static parse checks where available, then a MATLAB `R2019b+` run of `run_experiment.m`.
 - E-Prime: review docs/list/script consistency, assemble in E-Studio, then follow `docs/VALIDATION_CHECKLIST.md`.
 
 ## Agent Guidance

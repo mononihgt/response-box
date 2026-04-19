@@ -34,7 +34,7 @@ Python:
 
 MATLAB:
 - Open `response-box-matlab/` as the working folder.
-- Run `run_experiment.m` from MATLAB.
+- Run `run_experiment.m` from MATLAB `R2019b` or later; the implementation uses the `serialport` API introduced in `R2019b`.
 - Use `run_matlab_safe.ps1` only as a local launch helper.
 
 E-Prime:
@@ -59,7 +59,7 @@ E-Prime:
 - Start with the narrowest deterministic check for changed code.
 - For TS changes, run `npm run build` and manually verify connect/test/export flows when hardware/browser access is available.
 - For Python changes, run import/compile checks and use `uv run connection_test.py` plus a full PsychoPy pass when hardware/display access is available.
-- For MATLAB and E-Prime changes, run available static checks and document any runtime checks blocked by proprietary tooling or hardware.
+- For MATLAB and E-Prime changes, run available static checks and document any runtime checks blocked by proprietary tooling or hardware. MATLAB validation requires `R2019b+`.
 - Never claim hardware timing correctness from static checks alone.
 
 ## Documentation Rules

@@ -20,6 +20,7 @@ This folder contains the MATLAB Stroop implementation for the response box, incl
 - Function names use `snake_case` to match existing modules.
 - Prefer explicit structs and documented fields for trial/result rows.
 - Avoid cross-module side effects; pass state through arguments/returns.
+- Preserve MATLAB `R2019b+` compatibility unless the user explicitly asks to raise the minimum version; serial I/O uses the `serialport` API introduced in `R2019b`.
 
 ## Validation
 
