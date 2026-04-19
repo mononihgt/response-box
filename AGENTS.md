@@ -5,9 +5,10 @@ This workspace collects response-box experiment implementations for multiple run
 
 ## Project Map
 - `response-box-ts/`: TypeScript + Vite browser app using the Web Serial API.
-- `response-box-python/`: Python utilities, serial diagnostics, PsychoPy Stroop experiment, drivers, and user docs.
+- `response-box-python/`: Python utilities, serial diagnostics, PsychoPy Stroop experiment, and user docs.
 - `response-box-matlab/`: MATLAB Stroop experiment with namespaced helpers under `+rbx/`.
 - `response-box-eprime/`: E-Prime implementation assets, E-Basic inline scripts, list files, runtime config, and build docs.
+- `CH341SER Driver/`: shared CH341/CH340 USB-serial driver archives for workspace projects.
 
 Each child folder may also be an independent Git repository. Do not assume the workspace root is the canonical Git root.
 
@@ -15,7 +16,7 @@ Each child folder may also be an independent Git repository. Do not assume the w
 - Keep runtime-specific code inside its project folder; do not share code by copying between runtimes unless the user asks.
 - Put reusable implementation code in source/helper modules, not in top-level launcher scripts.
 - Keep generated files, caches, logs, and local environments out of versioned source when possible.
-- Preserve hardware support assets such as `CH341SER_DRIVER/`, E-Prime `runtime/` templates, and experiment list files unless the task explicitly changes them.
+- Preserve hardware support assets such as `CH341SER Driver/`, E-Prime `runtime/` templates, and experiment list files unless the task explicitly changes them.
 - Prefer scoped `AGENTS.md` files for project-specific rules.
 
 ## Development Commands

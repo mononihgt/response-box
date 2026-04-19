@@ -12,7 +12,7 @@ Scope: this file applies to everything under `response-box-python/`.
 - `experiment_psychopy.py`: end-to-end Stroop experiment script.
 - `response_box_data/`: runtime CSV output directory.
 - `docs/`: operator/user documentation.
-- `CH341SER_DRIVER/`: bundled driver assets; do not rename or move.
+- `../CH341SER Driver/`: workspace-level driver bundle used during device setup; keep Python docs aligned if this shared path changes.
 
 ## Engineering Rules
 - Keep serial protocol details centralized in `src/reaction_box.py`.

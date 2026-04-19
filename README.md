@@ -4,9 +4,12 @@ This workspace contains four response-box experiment implementations that target
 
 ## Projects
 - `response-box-ts/`: browser-based Web Serial implementation built with TypeScript and Vite.
-- `response-box-python/`: Python serial utilities, connection diagnostics, PsychoPy Stroop experiment, drivers, and user manuals.
+- `response-box-python/`: Python serial utilities, connection diagnostics, PsychoPy Stroop experiment, and user manuals.
 - `response-box-matlab/`: MATLAB Stroop experiment using package helpers under `+rbx/`.
 - `response-box-eprime/`: E-Prime build assets, E-Basic inline scripts, list files, runtime config, and validation docs.
+
+## Shared Assets
+- `CH341SER Driver/`: workspace-level CH341/CH340 USB-serial driver bundle (`CH341SER.ZIP` and `CH341SER_MAC.ZIP`) shared across runtimes.
 
 ## Quick Start
 TypeScript:

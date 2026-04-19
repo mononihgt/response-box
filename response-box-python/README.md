@@ -2,6 +2,8 @@
 
 Python tooling and PsychoPy integration for the USB reaction box used in behavioral experiments.
 
+The CH341/CH340 driver bundle now lives at the workspace root in `../CH341SER Driver/`.
+
 ## What This Project Includes
 - `src/serial_utils.py`: serial discovery and device probing.
 - `src/reaction_box.py`: low-level frame read/parse (`t1`, `t2`, `system_delay`).
@@ -44,7 +46,6 @@ Use `t1` as the primary reaction-time variable in analysis.
 response-box-python/
 ├── src/
 ├── docs/
-├── CH341SER_DRIVER/
 ├── response_box_data/
 ├── connection_test.py
 ├── experiment_psychopy.py
@@ -52,6 +53,15 @@ response-box-python/
 ├── build_windows.ps1
 ├── packaging_requirements.txt
 └── pyproject.toml
+```
+
+Shared workspace asset:
+
+```text
+response-box/
+└── CH341SER Driver/
+    ├── CH341SER.ZIP
+    └── CH341SER_MAC.ZIP
 ```
 
 ## Engineering Notes
@@ -72,9 +82,9 @@ uv run python -m compileall src connection_test.py experiment_psychopy.py
 ## Platform Requirements
 - Python `>=3.10`
 - `psychopy`, `pyserial`, `scipy`
-- CH341/CH340 driver installed for the reaction box
+- CH341/CH340 driver installed for the reaction box from `../CH341SER Driver/`
 
 ## Troubleshooting
-- Device not found: check USB cable, power, and CH341 driver install.
+- Device not found: check USB cable, power, and the driver package in `../CH341SER Driver/`.
 - Serial busy: close other apps that may hold the same COM/TTY port.
 - Unexpected RT values: run calibration and detailed-parameter diagnostics from `connection_test.py`.
